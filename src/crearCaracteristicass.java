@@ -1,181 +1,20 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
+ */
 
-import java.sql.*;
-import java.sql.Connection;
-import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
+/**
+ *
+ * @author david
+ */
+public class crearCaracteristicass extends javax.swing.JPanel {
 
-public final class crearCategoria extends javax.swing.JPanel {
-    Conexion conn;
-    Connection cn;
-    Statement st;
-    ResultSet rs;
-    DefaultTableModel modelo;
-    int id;
-    
-    
-    public crearCategoria() {
+    /**
+     * Creates new form crearCaracteristicass
+     */
+    public crearCaracteristicass() {
         initComponents();
-        conn = new Conexion();  // Instanciar la conexión
-        conn.conectar();
-        listar();
     }
-    
-    void listar(){
-        // Consulta SQL
-        String sql ="SELECT * FROM categorias";
-        
-        try{
-            cn = conn.getConnection();
-            // Crear el statement y ejecutar la consulta
-            st = cn.createStatement();
-            rs=st.executeQuery(sql);
-            // Arreglo para almacenar los datos de cada fila
-            Object[]categorias=new Object[2];
-            // Obtener el modelo de la tabla
-            modelo=(DefaultTableModel)tabledatos.getModel();
-            // Limpiar las filas existentes en el modelo de la tabla
-            modelo.setRowCount(0);
-            // Iterar sobre los resultados de la consulta
-            while (rs.next()){
-                categorias[0]=rs.getInt("id");
-                categorias[1]=rs.getString("nombreCategoria");
-                // Añadir fila al modelo
-                modelo.addRow(categorias);
-            }
-            // Actualizar el modelo de la tabla
-            tabledatos.setModel(modelo);
-        } catch(SQLException e){
-            // Manejar errores e imprimirlos en la consola
-            System.out.println("Error al listar las categorías: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-    
-    /*void Agregar(){
-        String categoria = txtcategoria.getText();
-        if(categoria.equals("")){
-            JOptionPane.showMessageDialog(null, "Caja vacia");
-        }else{
-            String sql="INSERT INTO categorias(nombreCategoria)values('"+ categoria +"')";
-            try{
-                cn = conn.getConnection();
-                st = cn.createStatement();
-                st.executeUpdate(sql);
-                JOptionPane.showMessageDialog(null, "Categoria Agregado");
-                limpiartabla();
-            } catch (Exception e){
-                
-            }
-        }
-    }*/
-    
-    void limpiartabla(){
-        for(int i=0; i<=tabledatos.getRowCount();i++){
-            modelo.removeRow(i);
-            i=i-1;
-        }
-    }
-    
-    void Agregar() {
-        String categoria = txtcategoria.getText();
-
-        if (categoria.equals("")) {
-            JOptionPane.showMessageDialog(null, "La caja de categoría está vacía");
-        } else {
-            try {
-                cn = conn.getConnection();
-                // Verificar si la categoría ya existe
-                String sqlVerificar = "SELECT COUNT(*) FROM categorias WHERE nombreCategoria = ?";
-                PreparedStatement pstVerificar = cn.prepareStatement(sqlVerificar);
-                pstVerificar.setString(1, categoria);
-                ResultSet rs = pstVerificar.executeQuery();
-
-                if (rs.next() && rs.getInt(1) > 0) {
-                    // Si la categoría ya existe, mostrar un mensaje
-                    JOptionPane.showMessageDialog(null, "La categoría ya existe");
-                } else {
-                    // Si no existe, insertar la nueva categoría
-                    String sqlInsertar = "INSERT INTO categorias(nombreCategoria) VALUES (?)";
-                    PreparedStatement pstInsertar = cn.prepareStatement(sqlInsertar);
-                    pstInsertar.setString(1, categoria);
-                    pstInsertar.executeUpdate();
-                    JOptionPane.showMessageDialog(null, "Categoría agregada exitosamente");
-                    limpiartabla();
-                }
-            } catch (Exception e) {
-                //JOptionPane.showMessageDialog(null, "Error al agregar la categoría: " + e.getMessage());
-            }
-        }
-    }
-    
-    void modificar(){
-        String categoria=txtcategoria.getText();
-        String sql="UPDATE categorias set nombreCategoria='"+ categoria +"' WHERE id="+id;
-        if(categoria.equals("")){
-            JOptionPane.showMessageDialog(null, "Debe ingresar datos");
-        }else{
-            try{
-                cn=conn.getConnection();
-                st=cn.createStatement();
-                st.executeUpdate(sql);
-                JOptionPane.showMessageDialog(null, "Categoria actualizado");
-            }catch(Exception e){
-                limpiartabla();
-            }
-        }
-    }
-    
-    /*void eliminar(){
-        int filaseleccionado=tabledatos.getSelectedRow();
-        if(filaseleccionado==-1){
-            JOptionPane.showMessageDialog(null, "Debe seleccionar una fila");
-        }else{
-            try{
-                String sql="DELETE FROM categorias WHERE id="+id;
-                cn=conn.getConnection();
-                st=cn.createStatement();
-                st.executeUpdate(sql);
-                JOptionPane.showMessageDialog(null, "Categoria eliminada");
-                limpiartabla();
-            }catch(Exception e){
-                
-            }
-        }
-    }*/
-    
-    void eliminar() {
-        int filaseleccionado = tabledatos.getSelectedRow();
-
-        if (filaseleccionado == -1) {
-            JOptionPane.showMessageDialog(null, "Debe seleccionar una fila");
-        } else {
-            // Mostrar un cuadro de confirmación antes de eliminar
-            int confirmacion = JOptionPane.showConfirmDialog(null, "¿Está seguro de que desea eliminar la categoría?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-
-            if (confirmacion == JOptionPane.YES_OPTION) {
-                try {
-                    String sql = "DELETE FROM categorias WHERE id=" + id;
-                    cn = conn.getConnection();
-                    st = cn.createStatement();
-                    st.executeUpdate(sql);
-                    JOptionPane.showMessageDialog(null, "Categoría eliminada");
-                    limpiartabla();
-                } catch (Exception e) {
-                    //JOptionPane.showMessageDialog(null, "Error al eliminar la categoría: " + e.getMessage());
-                }
-            } else {
-                JOptionPane.showMessageDialog(null, "Eliminación cancelada");
-            }
-        }
-    }
-    
-    void nuevo(){
-        txtid.setText("");
-        txtcategoria.setText("");
-        txtcategoria.requestFocus();
-    }
-    
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -191,8 +30,10 @@ public final class crearCategoria extends javax.swing.JPanel {
         jPanel2 = new javax.swing.JPanel();
         txtid = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        txtcategoria = new javax.swing.JTextField();
+        txtcaracteristica = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        txtarea = new javax.swing.JTextArea();
         jPanel3 = new javax.swing.JPanel();
         btnmodificar = new javax.swing.JButton();
         btnagregar = new javax.swing.JButton();
@@ -204,33 +45,39 @@ public final class crearCategoria extends javax.swing.JPanel {
 
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel1.setBackground(new java.awt.Color(204, 255, 204));
+        jPanel1.setBackground(new java.awt.Color(255, 51, 51));
 
-        jLabel1.setText("REGISTRO DE CATEGORIAS");
+        jLabel1.setText("REGISTRO DE CARACTERISTICAS");
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos"));
 
         txtid.setEditable(false);
         txtid.setEnabled(false);
 
-        jLabel2.setText("Categoria");
+        jLabel2.setText("NOMBRE CARACTERISTICA");
 
         jLabel3.setText("Id");
+
+        txtarea.setColumns(20);
+        txtarea.setRows(5);
+        jScrollPane2.setViewportView(txtarea);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(26, 26, 26)
+                .addContainerGap(26, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
                     .addComponent(jLabel2))
-                .addGap(28, 28, 28)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtcategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtcaracteristica, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtid, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -241,8 +88,11 @@ public final class crearCategoria extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(txtcategoria, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtcaracteristica, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(19, 19, 19))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jScrollPane2)
+                .addContainerGap())
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Operaciones"));
@@ -286,7 +136,7 @@ public final class crearCategoria extends javax.swing.JPanel {
                 .addComponent(btneliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnnuevo, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
             .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel3Layout.createSequentialGroup()
                     .addGap(32, 32, 32)
@@ -316,7 +166,7 @@ public final class crearCategoria extends javax.swing.JPanel {
 
             },
             new String [] {
-                "ID", "CATEGORIA"
+                "ID", "CARACTERISTICA"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -333,10 +183,6 @@ public final class crearCategoria extends javax.swing.JPanel {
             }
         });
         jScrollPane1.setViewportView(tabledatos);
-        if (tabledatos.getColumnModel().getColumnCount() > 0) {
-            tabledatos.getColumnModel().getColumn(0).setMinWidth(50);
-            tabledatos.getColumnModel().getColumn(0).setPreferredWidth(50);
-        }
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -365,11 +211,12 @@ public final class crearCategoria extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(21, 21, 21))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(42, 42, 42))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -388,42 +235,41 @@ public final class crearCategoria extends javax.swing.JPanel {
         add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 569, 551));
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnagregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnagregarActionPerformed
-        Agregar();
+    private void btnmodificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnmodificarActionPerformed
+        /*modificar();
         listar();
-        nuevo();
+        nuevo();*/
+    }//GEN-LAST:event_btnmodificarActionPerformed
+
+    private void btnagregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnagregarActionPerformed
+        /*Agregar();
+        listar();
+        nuevo();*/
     }//GEN-LAST:event_btnagregarActionPerformed
 
+    private void btnnuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnnuevoActionPerformed
+        /*nuevo();*/
+    }//GEN-LAST:event_btnnuevoActionPerformed
+
+    private void btneliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btneliminarActionPerformed
+        /*eliminar();
+        listar();
+        nuevo();*/
+    }//GEN-LAST:event_btneliminarActionPerformed
+
     private void tabledatosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabledatosMouseClicked
-        int fila=tabledatos.getSelectedRow();
+        /*int fila=tabledatos.getSelectedRow();
         if(fila==-1){
             JOptionPane.showMessageDialog(null, "Usuario no seleccionado");
         }else{
             id=Integer.parseInt((String)tabledatos.getValueAt(fila, 0).toString());
             String categoria=(String)tabledatos.getValueAt(fila, 1);
             txtid.setText(""+id);
-            txtcategoria.setText(categoria);
-            
-        }
+            txtcaracteristica.setText(categoria);
+
+        }*/
     }//GEN-LAST:event_tabledatosMouseClicked
 
-    private void btnmodificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnmodificarActionPerformed
-        modificar();
-        listar();
-        nuevo();
-    }//GEN-LAST:event_btnmodificarActionPerformed
-
-    private void btneliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btneliminarActionPerformed
-        eliminar();
-        listar();
-        nuevo();
-    }//GEN-LAST:event_btneliminarActionPerformed
-
-    private void btnnuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnnuevoActionPerformed
-        nuevo();
-    }//GEN-LAST:event_btnnuevoActionPerformed
-
-    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnagregar;
@@ -438,11 +284,10 @@ public final class crearCategoria extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable tabledatos;
-    private javax.swing.JTextField txtcategoria;
+    private javax.swing.JTextArea txtarea;
+    private javax.swing.JTextField txtcaracteristica;
     private javax.swing.JTextField txtid;
     // End of variables declaration//GEN-END:variables
 }
-
-
-
