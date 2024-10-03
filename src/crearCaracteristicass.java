@@ -1,19 +1,154 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 
-/**
- *
- * @author david
- */
+import java.sql.*;
+import java.sql.Connection;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 public class crearCaracteristicass extends javax.swing.JPanel {
 
-    /**
-     * Creates new form crearCaracteristicass
-     */
+    Conexion conn;
+    Connection cn;
+    Statement st;
+    ResultSet rs;
+    DefaultTableModel modelo;
+    int id;
+    
     public crearCaracteristicass() {
         initComponents();
+        conn = new Conexion();  // Instanciar la conexión
+        conn.conectar();
+        listar();
+    }
+    
+    
+    void listar(){
+        // Consulta SQL
+        String sql ="SELECT * FROM caracteristicas";
+        
+        try{
+            cn = conn.getConnection();
+            // Crear el statement y ejecutar la consulta
+            st = cn.createStatement();
+            rs=st.executeQuery(sql);
+            // Arreglo para almacenar los datos de cada fila
+            Object[]caracteristicas=new Object[3];
+            // Obtener el modelo de la tabla
+            modelo=(DefaultTableModel)tabledatos.getModel();
+            // Limpiar las filas existentes en el modelo de la tabla
+            modelo.setRowCount(0);
+            // Iterar sobre los resultados de la consulta
+            while (rs.next()){
+                caracteristicas[0]=rs.getInt("id");
+                caracteristicas[1]=rs.getString("caracteristica");
+                caracteristicas[2]=rs.getString("descripcion");
+                // Añadir fila al modelo
+                modelo.addRow(caracteristicas);
+            }
+            // Actualizar el modelo de la tabla
+            tabledatos.setModel(modelo);
+        } catch(SQLException e){
+            // Manejar errores e imprimirlos en la consola
+            System.out.println("Error al listar las categorías: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    void limpiartabla(){
+        for(int i=0; i<=tabledatos.getRowCount();i++){
+            modelo.removeRow(i);
+            i=i-1;
+        }
+    }
+    
+    void nuevo(){
+        txtid.setText("");
+        txtcaracteristica.setText("");
+        txtdescripcion.setText("");
+        txtcaracteristica.requestFocus();
+        txtdescripcion.requestFocus();
+    }
+    
+    void Agregar() {
+        String caracteristicas = txtcaracteristica.getText();
+        String descripcion = txtdescripcion.getText();
+
+        if (caracteristicas.equals("")) {
+            JOptionPane.showMessageDialog(null, "La caja de caracteristica está vacía");
+        } else {
+            try {
+                cn = conn.getConnection();
+                // Verificar si la categoría ya existe
+                String sqlVerificar = "SELECT COUNT(*) FROM caracteristicas WHERE caracteristica = ?";
+                PreparedStatement pstVerificar = cn.prepareStatement(sqlVerificar);
+                pstVerificar.setString(1, caracteristicas);
+                ResultSet rs = pstVerificar.executeQuery();
+
+                if (rs.next() && rs.getInt(1) > 0) {
+                    // Si la categoría ya existe, mostrar un mensaje
+                    JOptionPane.showMessageDialog(null, "La caracteristica ya existe");
+                } else {
+                    // Si no existe, insertar la nueva categoría
+                    String sqlInsertar = "INSERT INTO caracteristicas(caracteristica, descripcion) VALUES (?, ?)";
+                    PreparedStatement pstInsertar = cn.prepareStatement(sqlInsertar);
+                    pstInsertar.setString(1, caracteristicas);
+                    pstInsertar.setString(2, descripcion);
+                    pstInsertar.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Caracteristica agregada exitosamente");
+                    limpiartabla();
+                }
+            } catch (Exception e) {
+                //JOptionPane.showMessageDialog(null, "Error al agregar la categoría: " + e.getMessage());
+            }
+        }
+    }
+    
+    void modificar(){
+        String caracteristica = txtcaracteristica.getText();
+        String descripcion = txtdescripcion.getText();
+        String sql="UPDATE caracteristicas set caracteristica='"+ caracteristica +"', descripcion='"+ descripcion +"' WHERE id="+id;
+        if(caracteristica.equals("")){
+            JOptionPane.showMessageDialog(null, "Debe ingresar datos");
+        }else{
+            try{
+                cn=conn.getConnection();
+                st=cn.createStatement();
+                st.executeUpdate(sql);
+                JOptionPane.showMessageDialog(null, "Caracteristica actualizado");
+            }catch(Exception e){
+                limpiartabla();
+            }
+        }
+    }
+    
+    void eliminar() {
+        int filaseleccionado = tabledatos.getSelectedRow();
+
+        if (filaseleccionado == -1) {
+            JOptionPane.showMessageDialog(null, "Debe seleccionar una fila");
+        } else {
+            // Confirmar la eliminación del usuario
+            int confirmacion = JOptionPane.showConfirmDialog(null, "¿Está seguro de que desea eliminar esta caracteeristica?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+
+            if (confirmacion == JOptionPane.YES_OPTION) {
+                try {
+                    // Obtener el usuario de la fila seleccionada
+                    String caracteristica = (String) tabledatos.getValueAt(filaseleccionado, 1);  // Asumiendo que la columna 1 es 'usuario'
+
+                    String sql = "DELETE FROM caracteristicas WHERE caracteristica = ?";
+                    cn = conn.getConnection();
+                    PreparedStatement pstEliminar = cn.prepareStatement(sql);
+                    pstEliminar.setString(1, caracteristica);
+                    pstEliminar.executeUpdate();
+
+                    JOptionPane.showMessageDialog(null, "Caracteristica eliminado");
+                    limpiartabla();
+                } catch (Exception e) {
+                    //JOptionPane.showMessageDialog(null, "Error al eliminar el usuario: " + e.getMessage());
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Eliminación cancelada");
+            }
+        }
     }
 
     /**
@@ -33,7 +168,7 @@ public class crearCaracteristicass extends javax.swing.JPanel {
         txtcaracteristica = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        txtarea = new javax.swing.JTextArea();
+        txtdescripcion = new javax.swing.JTextArea();
         jPanel3 = new javax.swing.JPanel();
         btnmodificar = new javax.swing.JButton();
         btnagregar = new javax.swing.JButton();
@@ -58,9 +193,9 @@ public class crearCaracteristicass extends javax.swing.JPanel {
 
         jLabel3.setText("Id");
 
-        txtarea.setColumns(20);
-        txtarea.setRows(5);
-        jScrollPane2.setViewportView(txtarea);
+        txtdescripcion.setColumns(20);
+        txtdescripcion.setRows(5);
+        jScrollPane2.setViewportView(txtdescripcion);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -166,11 +301,11 @@ public class crearCaracteristicass extends javax.swing.JPanel {
 
             },
             new String [] {
-                "ID", "CARACTERISTICA"
+                "ID", "CARACTERISTICA", "DESCRIPCION"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                true, false
+                true, false, true
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -183,6 +318,11 @@ public class crearCaracteristicass extends javax.swing.JPanel {
             }
         });
         jScrollPane1.setViewportView(tabledatos);
+        if (tabledatos.getColumnModel().getColumnCount() > 0) {
+            tabledatos.getColumnModel().getColumn(0).setMinWidth(40);
+            tabledatos.getColumnModel().getColumn(0).setPreferredWidth(40);
+            tabledatos.getColumnModel().getColumn(0).setMaxWidth(40);
+        }
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -236,38 +376,40 @@ public class crearCaracteristicass extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnmodificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnmodificarActionPerformed
-        /*modificar();
+        modificar();
         listar();
-        nuevo();*/
+        nuevo();
     }//GEN-LAST:event_btnmodificarActionPerformed
 
     private void btnagregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnagregarActionPerformed
-        /*Agregar();
+        Agregar();
         listar();
-        nuevo();*/
+        nuevo();
     }//GEN-LAST:event_btnagregarActionPerformed
 
     private void btnnuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnnuevoActionPerformed
-        /*nuevo();*/
+        nuevo();
     }//GEN-LAST:event_btnnuevoActionPerformed
 
     private void btneliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btneliminarActionPerformed
-        /*eliminar();
+        eliminar();
         listar();
-        nuevo();*/
+        nuevo();
     }//GEN-LAST:event_btneliminarActionPerformed
 
     private void tabledatosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabledatosMouseClicked
-        /*int fila=tabledatos.getSelectedRow();
+        int fila=tabledatos.getSelectedRow();
         if(fila==-1){
             JOptionPane.showMessageDialog(null, "Usuario no seleccionado");
         }else{
             id=Integer.parseInt((String)tabledatos.getValueAt(fila, 0).toString());
-            String categoria=(String)tabledatos.getValueAt(fila, 1);
+            String caracteristica=(String)tabledatos.getValueAt(fila, 1);
+            String descripcion=(String)tabledatos.getValueAt(fila, 2);
             txtid.setText(""+id);
-            txtcaracteristica.setText(categoria);
+            txtcaracteristica.setText(caracteristica);
+            txtdescripcion.setText(descripcion);
 
-        }*/
+        }
     }//GEN-LAST:event_tabledatosMouseClicked
 
 
@@ -286,8 +428,8 @@ public class crearCaracteristicass extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable tabledatos;
-    private javax.swing.JTextArea txtarea;
     private javax.swing.JTextField txtcaracteristica;
+    private javax.swing.JTextArea txtdescripcion;
     private javax.swing.JTextField txtid;
     // End of variables declaration//GEN-END:variables
 }

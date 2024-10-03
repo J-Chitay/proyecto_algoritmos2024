@@ -51,24 +51,6 @@ public final class crearCategoria extends javax.swing.JPanel {
         }
     }
     
-    /*void Agregar(){
-        String categoria = txtcategoria.getText();
-        if(categoria.equals("")){
-            JOptionPane.showMessageDialog(null, "Caja vacia");
-        }else{
-            String sql="INSERT INTO categorias(nombreCategoria)values('"+ categoria +"')";
-            try{
-                cn = conn.getConnection();
-                st = cn.createStatement();
-                st.executeUpdate(sql);
-                JOptionPane.showMessageDialog(null, "Categoria Agregado");
-                limpiartabla();
-            } catch (Exception e){
-                
-            }
-        }
-    }*/
-    
     void limpiartabla(){
         for(int i=0; i<=tabledatos.getRowCount();i++){
             modelo.removeRow(i);
