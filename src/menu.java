@@ -35,6 +35,8 @@ public class menu extends javax.swing.JFrame {
         btnCaracteristicas = new javax.swing.JButton();
         btnCategorias = new javax.swing.JButton();
         btnUsuarios = new javax.swing.JButton();
+        btnEspecificacion = new javax.swing.JButton();
+        btnCrearproducto = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -70,6 +72,20 @@ public class menu extends javax.swing.JFrame {
             }
         });
 
+        btnEspecificacion.setText("ESPECIFICACIONES");
+        btnEspecificacion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEspecificacionActionPerformed(evt);
+            }
+        });
+
+        btnCrearproducto.setText("CREAR PRODUCTO");
+        btnCrearproducto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCrearproductoActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -79,7 +95,9 @@ public class menu extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnCategorias, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
                     .addComponent(btnUsuarios, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnCaracteristicas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnCaracteristicas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnEspecificacion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnCrearproducto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(content, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -93,6 +111,10 @@ public class menu extends javax.swing.JFrame {
                 .addComponent(btnUsuarios, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnCaracteristicas, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnEspecificacion, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnCrearproducto, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -133,6 +155,28 @@ public class menu extends javax.swing.JFrame {
         content.repaint();
     }//GEN-LAST:event_btnUsuariosActionPerformed
 
+    private void btnEspecificacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEspecificacionActionPerformed
+        crearEspecificaciones p4 = new crearEspecificaciones();
+        p4.setSize(569, 551);
+        p4.setLocation(0, 0);
+        
+        content.removeAll();
+        content.add(p4, BorderLayout.CENTER);
+        content.revalidate();
+        content.repaint();
+    }//GEN-LAST:event_btnEspecificacionActionPerformed
+
+    private void btnCrearproductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCrearproductoActionPerformed
+        crearProducto p5 = new crearProducto();
+        p5.setSize(569, 551);
+        p5.setLocation(0, 0);
+        
+        content.removeAll();
+        content.add(p5, BorderLayout.CENTER);
+        content.revalidate();
+        content.repaint();
+    }//GEN-LAST:event_btnCrearproductoActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -171,6 +215,8 @@ public class menu extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCaracteristicas;
     private javax.swing.JButton btnCategorias;
+    private javax.swing.JButton btnCrearproducto;
+    private javax.swing.JButton btnEspecificacion;
     private javax.swing.JButton btnUsuarios;
     private javax.swing.JPanel content;
     // End of variables declaration//GEN-END:variables

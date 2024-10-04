@@ -29,6 +29,8 @@
                   <Component id="btnCategorias" pref="165" max="32767" attributes="0"/>
                   <Component id="btnUsuarios" max="32767" attributes="0"/>
                   <Component id="btnCaracteristicas" alignment="0" max="32767" attributes="0"/>
+                  <Component id="btnEspecificacion" max="32767" attributes="0"/>
+                  <Component id="btnCrearproducto" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="content" min="-2" max="-2" attributes="0"/>
@@ -45,6 +47,10 @@
               <Component id="btnUsuarios" min="-2" pref="40" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="btnCaracteristicas" min="-2" pref="40" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="btnEspecificacion" min="-2" pref="40" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="btnCrearproducto" min="-2" pref="36" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
@@ -88,6 +94,22 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnUsuariosActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnEspecificacion">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="ESPECIFICACIONES"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnEspecificacionActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnCrearproducto">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="CREAR PRODUCTO"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCrearproductoActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
