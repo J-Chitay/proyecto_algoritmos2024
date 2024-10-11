@@ -17,6 +17,7 @@ public class crearProducto extends javax.swing.JPanel {
         conn.conectar();
         llenarComboBoxCategorias();
         llenarComboBoxCaracteristicas();
+        listar();
     }
     
     // Método para llenar el JComboBox con las categorías de la base de datos
@@ -64,39 +65,49 @@ public class crearProducto extends javax.swing.JPanel {
         }
     }
     
+    
     void listar(){
-        // Consulta SQL
-        String sql ="SELECT * FROM productos";
+        // Consulta SQL con JOIN para obtener el nombre de la categoría y las características
+        String sql = "SELECT p.id, p.nombreProducto, c.nombreCategoria, car1.caracteristica AS nombreCaracteristica1, " +
+                 "car2.caracteristica AS nombreCaracteristica2, p.precio, p.stock, p.descripcion " +
+                 "FROM productos p " +
+                 "JOIN categorias c ON p.id_categoria = c.id " +
+                 "JOIN caracteristicas car1 ON p.id_caracteristica1 = car1.id " +
+                 "JOIN caracteristicas car2 ON p.id_caracteristica2 = car2.id";
         
-        try{
+        try {
             cn = conn.getConnection();
-            // Crear el statement y ejecutar la consulta
             st = cn.createStatement();
-            rs=st.executeQuery(sql);
+            rs = st.executeQuery(sql);
+
             // Arreglo para almacenar los datos de cada fila
-            Object[]productos=new Object[7];
-            // Obtener el modelo de la tabla
-            modelo=(DefaultTableModel)tabledatos.getModel();
-            // Limpiar las filas existentes en el modelo de la tabla
-            modelo.setRowCount(0);
+            Object[] productos = new Object[8];
+
+            // Definir el modelo de la tabla con los nombres de columnas correctos
+            String[] columnNames = {"ID", "Nombre Producto", "Categoría", "Característica 1", "Característica 2", "Precio", "Stock", "Descripción"};
+            modelo = new DefaultTableModel(null, columnNames);
+            tabledatos.setModel(modelo);
+
             // Iterar sobre los resultados de la consulta
-            while (rs.next()){
-                productos[0]=rs.getInt("id");
-                productos[1]=rs.getString("nombreProducto");
-                productos[2]=rs.getString("id_categoria");
-                productos[3]=rs.getString("id_caracteristica1");
-                productos[4]=rs.getString("id_caracteristica2");
-                productos[5]=rs.getString("precio");
-                productos[6]=rs.getString("stock");
-                productos[7]=rs.getString("descripcion");
+            while (rs.next()) {
+                productos[0] = rs.getInt("id");
+                productos[1] = rs.getString("nombreProducto");
+                productos[2] = rs.getString("nombreCategoria"); // Nombre de la categoría
+                productos[3] = rs.getString("nombreCaracteristica1"); // Nombre de la primera característica
+                productos[4] = rs.getString("nombreCaracteristica2"); // Nombre de la segunda característica
+                productos[5] = rs.getString("precio");
+                productos[6] = rs.getString("stock");
+                productos[7] = rs.getString("descripcion");
+
                 // Añadir fila al modelo
                 modelo.addRow(productos);
             }
+
             // Actualizar el modelo de la tabla
             tabledatos.setModel(modelo);
-        } catch(SQLException e){
-            // Manejar errores e imprimirlos en la consola
-            System.out.println("Error al listar los usuarios: " + e.getMessage());
+
+        } catch (SQLException e) {
+            System.out.println("Error al listar los productos: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -124,8 +135,8 @@ public class crearProducto extends javax.swing.JPanel {
     void Agregar() {
         String nombreProducto = txtproducto.getText();
         String id_categoria = comboBoxCategorias.getSelectedItem().toString();
-        String id_caracteristica1 = cbmCaracteristica1.getSelectedItem().toString();
-        String id_caracteristica2 = cbmCaracteristica2.getSelectedItem().toString();
+        String id_caracteristica11 = cbmCaracteristica1.getSelectedItem().toString();
+        String id_caracteristica22 = cbmCaracteristica2.getSelectedItem().toString();
         String precio = txtprecio.getText();
         String stock = txtstock.getText();
         String descripcion = txtdescripcion.getText();
@@ -145,13 +156,21 @@ public class crearProducto extends javax.swing.JPanel {
                     // Si el usuario ya existe, mostrar un mensaje
                     JOptionPane.showMessageDialog(null, "El producto ya existe");
                 } else {
+                    
+                    // Obtener el ID de la categoría seleccionada
+                    String idCategoria = obtenerIdPorNombre("categorias", id_categoria);
+                    // Obtener el ID de la primera característica seleccionada
+                    String idCaracteristica1 = obtenerIdCaracteristica1("caracteristicas", id_caracteristica11);
+                    // Obtener el ID de la segunda característica seleccionada
+                    String idCaracteristica2 = obtenerIdCaracteristica1("caracteristicas", id_caracteristica22);
+
                     // Si no existe, insertar el nuevo usuario
                     String sqlInsertar = "INSERT INTO productos(nombreProducto, id_categoria, id_caracteristica1, id_caracteristica2, precio, stock, descripcion) VALUES (?, ?, ?, ?, ?, ?, ?)";
                     PreparedStatement pstInsertar = cn.prepareStatement(sqlInsertar);
                     pstInsertar.setString(1, nombreProducto);                 
-                    pstInsertar.setString(2, id_categoria);
-                    pstInsertar.setString(3, id_caracteristica1);
-                    pstInsertar.setString(4, id_caracteristica2);
+                    pstInsertar.setString(2, idCategoria);
+                    pstInsertar.setString(3, idCaracteristica1);
+                    pstInsertar.setString(4, idCaracteristica2);
                     pstInsertar.setString(5, precio);
                     pstInsertar.setString(6, stock);
                     pstInsertar.setString(7, descripcion);
@@ -164,6 +183,118 @@ public class crearProducto extends javax.swing.JPanel {
             }
         }
     }
+    // Función para obtener el ID basado en el nombre seleccionado en el comboBox
+        String obtenerIdPorNombre(String tabla, String nombre) {
+            String id = null;
+            try {
+                String sql = "SELECT id FROM " + tabla + " WHERE nombreCategoria = ?";
+                PreparedStatement pst = cn.prepareStatement(sql);
+                pst.setString(1, nombre);
+                ResultSet rs = pst.executeQuery();
+                if (rs.next()) {
+                    id = rs.getString("id");
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Error al obtener el ID de " + nombre + ": " + e.getMessage());
+            }
+            return id;
+        }
+        
+        // Función para obtener el ID basado en el nombre seleccionado en el comboBox
+        String obtenerIdCaracteristica1(String tabla, String nombre) {
+            String id = null;
+            try {
+                String sql = "SELECT id FROM " + tabla + " WHERE caracteristica = ?";
+                PreparedStatement pst = cn.prepareStatement(sql);
+                pst.setString(1, nombre);
+                ResultSet rs = pst.executeQuery();
+                if (rs.next()) {
+                    id = rs.getString("id");
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Error al obtener el ID de " + nombre + ": " + e.getMessage());
+            }
+            return id;
+        }
+        
+        
+        void modificarProducto() {
+            // Obtener los valores de los campos
+            String nombreProducto = txtproducto.getText();
+            String id_categoriaa = comboBoxCategorias.getSelectedItem().toString();  // Nombre de la categoría
+            String id_caracteristica11 = cbmCaracteristica1.getSelectedItem().toString();  // Nombre de la primera característica
+            String id_caracteristica22 = cbmCaracteristica2.getSelectedItem().toString();  // Nombre de la segunda característica
+            String precio = txtprecio.getText();
+            String stock = txtstock.getText();
+            String descripcion = txtdescripcion.getText();
+
+            // Obtener el ID de la categoría y características
+            String idCategoria = obtenerIdPorNombre("categorias", id_categoriaa);
+            String idCaracteristica1 = obtenerIdCaracteristica1("caracteristicas", id_caracteristica11);
+            String idCaracteristica2 = obtenerIdCaracteristica1("caracteristicas", id_caracteristica22);
+
+            // Validar que los campos obligatorios no estén vacíos
+            if (nombreProducto.equals("") || precio.equals("") || stock.equals("")) {
+                JOptionPane.showMessageDialog(null, "Los campos nombre, precio y stock no pueden estar vacíos");
+            } else {
+                try {
+                    // Consulta SQL para actualizar el producto
+                    String sql = "UPDATE productos SET nombreProducto = ?, id_categoria = ?, id_caracteristica1 = ?, " +
+                                 "id_caracteristica2 = ?, precio = ?, stock = ?, descripcion = ? WHERE id = ?";
+
+                    cn = conn.getConnection();
+                    PreparedStatement pst = cn.prepareStatement(sql);
+                    pst.setString(1, nombreProducto);
+                    pst.setString(2, idCategoria);  // ID de la categoría
+                    pst.setString(3, idCaracteristica1);  // ID de la primera característica
+                    pst.setString(4, idCaracteristica2);  // ID de la segunda característica
+                    pst.setString(5, precio);
+                    pst.setString(6, stock);
+                    pst.setString(7, descripcion);
+                    pst.setInt(8, id);  // ID del producto que se está modificando
+
+                    pst.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Producto actualizado correctamente");
+                    limpiartabla();  // Llamar al método para refrescar la tabla
+
+                } catch (Exception e) {
+                    //JOptionPane.showMessageDialog(null, "Error al modificar el producto: " + e.getMessage());
+                }
+            }
+        }
+        
+        void eliminar() {
+            // Obtener la fila seleccionada
+            int filaseleccionado = tabledatos.getSelectedRow();
+
+            if (filaseleccionado == -1) {
+                JOptionPane.showMessageDialog(null, "Debe seleccionar una fila");
+            } else {
+                // Confirmar la eliminación del producto
+                int confirmacion = JOptionPane.showConfirmDialog(null, "¿Está seguro de que desea eliminar este producto?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+
+                if (confirmacion == JOptionPane.YES_OPTION) {
+                    try {
+                        // Obtener el ID del producto de la fila seleccionada (se asume que la columna 0 contiene el ID)
+                        int idProducto = Integer.parseInt(tabledatos.getValueAt(filaseleccionado, 0).toString());
+
+                        // Consulta SQL para eliminar el producto por ID
+                        String sql = "DELETE FROM productos WHERE id = ?";
+                        cn = conn.getConnection();
+                        PreparedStatement pstEliminar = cn.prepareStatement(sql);
+                        pstEliminar.setInt(1, idProducto);
+                        pstEliminar.executeUpdate();
+
+                        JOptionPane.showMessageDialog(null, "Producto eliminado");
+                        limpiartabla();  // Refrescar la tabla después de eliminar
+                    } catch (Exception e) {
+                        //JOptionPane.showMessageDialog(null, "Error al eliminar el producto: " + e.getMessage());
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Eliminación cancelada");
+                }
+            }
+        }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -453,9 +584,9 @@ public class crearProducto extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnmodificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnmodificarActionPerformed
-        /*modificar();
+        modificarProducto();
         listar();
-        nuevo();*/
+        nuevo();
     }//GEN-LAST:event_btnmodificarActionPerformed
 
     private void btnagregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnagregarActionPerformed
@@ -469,9 +600,9 @@ public class crearProducto extends javax.swing.JPanel {
     }//GEN-LAST:event_btnnuevoActionPerformed
 
     private void btneliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btneliminarActionPerformed
-        /*eliminar();
+        eliminar();
         listar();
-        nuevo();*/
+        nuevo();
     }//GEN-LAST:event_btneliminarActionPerformed
 
     private void tabledatosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabledatosMouseClicked

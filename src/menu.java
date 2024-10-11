@@ -1,15 +1,33 @@
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JOptionPane;
+import javax.swing.Timer;
+import java.sql.*;
+import java.sql.Connection;
+import javax.swing.JOptionPane;
+import javax.swing.Timer;
+import javax.swing.table.DefaultTableModel;
+
 
 
 
 public class menu extends javax.swing.JFrame {
 
-    /**
-     * Creates new form menu
-     */
+    Conexion conn;
+    Connection cn;
+    Statement st;
+    ResultSet rs;
+    DefaultTableModel modelo;
+    int id;
+    
+    
     public menu() {
         initComponents();
+        conn = new Conexion();  // Instanciar la conexión
+        conn.conectar();
+        verificarStockBajo();
         this.setTitle("MENU");
         
         crearUsuarios p1 = new crearUsuarios();
@@ -37,6 +55,9 @@ public class menu extends javax.swing.JFrame {
         btnUsuarios = new javax.swing.JButton();
         btnEspecificacion = new javax.swing.JButton();
         btnCrearproducto = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
+        btnVenta = new javax.swing.JButton();
+        btnAlertas = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -86,6 +107,20 @@ public class menu extends javax.swing.JFrame {
             }
         });
 
+        jButton1.setText("INGRESO STOCK");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        btnVenta.setText("VENTA PRODUCTOS");
+        btnVenta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVentaActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -97,7 +132,10 @@ public class menu extends javax.swing.JFrame {
                     .addComponent(btnUsuarios, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnCaracteristicas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnEspecificacion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnCrearproducto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnCrearproducto, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnVenta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnAlertas, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(content, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -115,6 +153,12 @@ public class menu extends javax.swing.JFrame {
                 .addComponent(btnEspecificacion, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnCrearproducto, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnVenta, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(45, 45, 45)
+                .addComponent(btnAlertas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -177,6 +221,60 @@ public class menu extends javax.swing.JFrame {
         content.repaint();
     }//GEN-LAST:event_btnCrearproductoActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        stock p6 = new stock();
+        p6.setSize(569, 551);
+        p6.setLocation(0, 0);
+        
+        content.removeAll();
+        content.add(p6, BorderLayout.CENTER);
+        content.revalidate();
+        content.repaint();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    void verificarStockBajo() {
+        try {
+            // Limpiar el combobox de alertas previas
+            btnAlertas.removeAllItems();
+
+            // Consulta para obtener los productos con stock bajo
+            String sql = "SELECT nombreProducto, stock FROM productos WHERE stock <= 5";
+            cn = conn.getConnection();
+            PreparedStatement pst = cn.prepareStatement(sql);
+            ResultSet rs = pst.executeQuery();
+
+            // Si existen productos con stock bajo, llenar el combobox
+            while (rs.next()) {
+                String nombreProducto = rs.getString("nombreProducto");
+                int stockActual = rs.getInt("stock");
+
+                // Añadir el producto y el stock actual al combobox
+                btnAlertas.addItem("Producto: " + nombreProducto + " - Stock: " + stockActual);
+            }
+
+            // Si no hay productos con stock bajo, mostrar un mensaje
+            if (btnAlertas.getItemCount() == 0) {
+                btnAlertas.addItem("No hay productos con stock bajo");
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error al verificar el stock: " + e.getMessage());
+        }
+    }
+    
+    
+    
+    private void btnVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVentaActionPerformed
+        ventas p7 = new ventas();
+        p7.setSize(569, 551);
+        p7.setLocation(0, 0);
+        
+        content.removeAll();
+        content.add(p7, BorderLayout.CENTER);
+        content.revalidate();
+        content.repaint();
+    }//GEN-LAST:event_btnVentaActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -203,21 +301,46 @@ public class menu extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(menu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
-        /* Create and display the form */
+        
+        
+        
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new menu().setVisible(true);
+                
+                // Mostrar un mensaje cuando la interfaz gráfica esté visible
+            System.out.println("Interfaz gráfica inicializada.");
+                new menu().setVisible(true);  
+                
+                System.out.println("Programa iniciado.");
+
+        Timer timer = new Timer(2000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("El Timer está funcionando cada 2 segundos...");
             }
         });
+
+        System.out.println("Iniciando el Timer...");
+        timer.start();
+
+        // Hacemos que el programa corra indefinidamente para que el Timer siga activo
+        while (true) {
+            // No hacemos nada, solo dejamos que el Timer siga funcionando
+        }
+            }
+        });
+ 
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> btnAlertas;
     private javax.swing.JButton btnCaracteristicas;
     private javax.swing.JButton btnCategorias;
     private javax.swing.JButton btnCrearproducto;
     private javax.swing.JButton btnEspecificacion;
     private javax.swing.JButton btnUsuarios;
+    private javax.swing.JButton btnVenta;
     private javax.swing.JPanel content;
+    private javax.swing.JButton jButton1;
     // End of variables declaration//GEN-END:variables
 }
