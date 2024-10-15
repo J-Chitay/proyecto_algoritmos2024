@@ -13,13 +13,19 @@ public class stock extends javax.swing.JPanel {
     DefaultTableModel modelo;
     int id;
     
-    public stock() {
+    private String nombreUsuario;
+    
+    public stock(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;  // Guardas el nombre de usuario
         initComponents();
         conn = new Conexion();  // Instanciar la conexión
         conn.conectar();
         txtproducto.setEditable(false);
         txtstock.setEnabled(false);
         btnAgregar.setEnabled(false);
+        cn = conn.getConnection();
+        
+        lblUser.setText("Usuario: " + nombreUsuario);
     }
     
     
@@ -32,7 +38,6 @@ public class stock extends javax.swing.JPanel {
         try {
             // Consulta para verificar si el producto existe y obtener el nombre y stock
             String sql = "SELECT nombreProducto, stock FROM productos WHERE id = ?";
-            cn = conn.getConnection();
             PreparedStatement pstBuscar = cn.prepareStatement(sql);
             pstBuscar.setString(1, idProducto);
             ResultSet rs = pstBuscar.executeQuery();
@@ -60,8 +65,9 @@ public class stock extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(null, "Error al buscar el producto: " + e.getMessage());
         }
     }
-    
+ 
 }
+    
     
     void actualizarStock() {
         String idProducto = txtid.getText();
@@ -82,6 +88,17 @@ public class stock extends javax.swing.JPanel {
                 pstActualizar.executeUpdate();
 
                 JOptionPane.showMessageDialog(null, "Stock actualizado correctamente");
+                
+                
+                String sqlInsertarMovimiento = "INSERT INTO historial_stock (id_producto, operacion, cantidad, usuario) VALUES (?, ?, ?, ?)";
+                PreparedStatement pstMovimiento = cn.prepareStatement(sqlInsertarMovimiento);
+                pstMovimiento.setString(1, idProducto); // ID del producto seleccionado
+                pstMovimiento.setString(2, "entrada"); // 'entrada' o 'salida'
+                pstMovimiento.setString(3, cantidadStock); // Cantidad agregada o retirada
+                pstMovimiento.setString(4, nombreUsuario); // Usuario que realiza la operación
+                pstMovimiento.executeUpdate();
+                
+                JOptionPane.showMessageDialog(null, "Se agrego el movimiento al historial");
 
                 // Limpiar y resetear los campos
                 txtid.setText("");
@@ -95,6 +112,7 @@ public class stock extends javax.swing.JPanel {
             }
         }
     }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -112,12 +130,28 @@ public class stock extends javax.swing.JPanel {
         txtstock = new javax.swing.JTextField();
         btnBuscar = new javax.swing.JButton();
         btnAgregar = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        lblUser = new javax.swing.JLabel();
 
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(204, 255, 255));
 
         jLabel1.setText("INGRESO DE STOCK PRODUCTOS");
+
+        txtid.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtidKeyTyped(evt);
+            }
+        });
+
+        txtstock.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtstockKeyTyped(evt);
+            }
+        });
 
         btnBuscar.setText("Buscar");
         btnBuscar.addActionListener(new java.awt.event.ActionListener() {
@@ -133,6 +167,14 @@ public class stock extends javax.swing.JPanel {
             }
         });
 
+        jLabel2.setText("ID");
+
+        jLabel3.setText("NOMBRE");
+
+        jLabel4.setText("STOCK");
+
+        lblUser.setText("jLabel5");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -140,10 +182,12 @@ public class stock extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(184, 184, 184)
-                        .addComponent(jLabel1))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(78, 78, 78)
+                        .addGap(29, 29, 29)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(txtid)
                             .addComponent(txtproducto)
@@ -151,24 +195,37 @@ public class stock extends javax.swing.JPanel {
                         .addGap(118, 118, 118)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(btnBuscar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnAgregar, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE))))
-                .addContainerGap(170, Short.MAX_VALUE))
+                            .addComponent(btnAgregar, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(184, 184, 184)
+                        .addComponent(jLabel1)
+                        .addGap(87, 87, 87)
+                        .addComponent(lblUser)))
+                .addContainerGap(87, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(37, 37, 37)
-                .addComponent(jLabel1)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(lblUser))
                 .addGap(97, 97, 97)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnBuscar, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                    .addComponent(txtid))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtid)
+                        .addComponent(jLabel2)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnAgregar, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                    .addComponent(txtproducto))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtproducto)
+                        .addComponent(jLabel3)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtstock, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtstock, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
                 .addContainerGap(306, Short.MAX_VALUE))
         );
 
@@ -183,12 +240,32 @@ public class stock extends javax.swing.JPanel {
         actualizarStock();
     }//GEN-LAST:event_btnAgregarActionPerformed
 
+    private void txtidKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtidKeyTyped
+        char c = evt.getKeyChar();
+        // Si no es un número (dígito) o la tecla de retroceso (para borrar), lo ignoramos
+        if (!Character.isDigit(c)) {
+            evt.consume(); // Evitar que el carácter se ingrese
+        }
+    }//GEN-LAST:event_txtidKeyTyped
+
+    private void txtstockKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtstockKeyTyped
+        char c = evt.getKeyChar();
+        // Si no es un número (dígito) o la tecla de retroceso (para borrar), lo ignoramos
+        if (!Character.isDigit(c)) {
+            evt.consume(); // Evitar que el carácter se ingrese
+        }
+    }//GEN-LAST:event_txtstockKeyTyped
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;
     private javax.swing.JButton btnBuscar;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel lblUser;
     private javax.swing.JTextField txtid;
     private javax.swing.JTextField txtproducto;
     private javax.swing.JTextField txtstock;

@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 
 
 public class login extends javax.swing.JFrame {
+    public String nombreUsuario; // Variable global para almacenar el nombre del usuario
 
 Conexion cx;
     public login() {
@@ -86,9 +87,11 @@ Conexion cx;
         Statement st = cx.conectar().createStatement();
         ResultSet rs = st.executeQuery(query);
         if(rs.next()){
+            String nombreUsuario = rs.getString("user");  // Capturar el nombre del usuario
             JOptionPane.showMessageDialog(this, "EL USUARIO EXISTE EN LA BASE DE DATOS");
             dispose();
             menu ir = new menu();
+            ir.setNombreUsuario(user); // Pasar el nombre de usuario
             ir.setVisible(true);
         }else{
             JOptionPane.showMessageDialog(this, "EL USUARIO NO EXISTE EN LA BASE DE DATOS");
