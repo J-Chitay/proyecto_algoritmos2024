@@ -22,24 +22,24 @@ public class historial extends javax.swing.JPanel {
     }
     
     private void llenarComboBoxProductos() {
-    try {
-        Connection cn = conn.getConnection();  // Conexión a la base de datos
-        String sql = "SELECT nombreProducto FROM productos";
-        Statement st = cn.createStatement();
-        ResultSet rs = st.executeQuery(sql);
-        
-        cbmProductos.removeAllItems(); // Limpiar el combo box por si ya tiene datos
-        
-        // Recorrer los resultados y agregar los productos al combo box
-        while (rs.next()) {
-            cbmProductos.addItem(rs.getString("nombreProducto"));
+        try {
+            Connection cn = conn.getConnection();  // Conexión a la base de datos
+            String sql = "SELECT nombreProducto FROM productos";
+            Statement st = cn.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+
+            cbmProductos.removeAllItems(); // Limpiar el combo box por si ya tiene datos
+
+            // Recorrer los resultados y agregar los productos al combo box
+            while (rs.next()) {
+                cbmProductos.addItem(rs.getString("nombreProducto"));
+            }
+
+            cn.close();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al cargar productos: " + e.getMessage());
         }
-        
-        cn.close();
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null, "Error al cargar productos: " + e.getMessage());
     }
-}
     
     
     private void mostrarMovimientos() {
