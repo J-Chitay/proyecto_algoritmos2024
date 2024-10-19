@@ -293,6 +293,12 @@ public class informesYgraficas extends javax.swing.JPanel {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Informe Producto"));
 
+        txtid.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtidKeyTyped(evt);
+            }
+        });
+
         btnMovimientos.setBackground(new java.awt.Color(13, 110, 253));
         btnMovimientos.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnMovimientos.setForeground(new java.awt.Color(255, 255, 255));
@@ -405,6 +411,14 @@ public class informesYgraficas extends javax.swing.JPanel {
     private void btnMovimientosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMovimientosActionPerformed
         generarInformeMovimientosStock();
     }//GEN-LAST:event_btnMovimientosActionPerformed
+
+    private void txtidKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtidKeyTyped
+        char c = evt.getKeyChar();
+        // Si no es un número (dígito) o la tecla de retroceso (para borrar), lo ignoramos
+        if (!Character.isDigit(c)) {
+            evt.consume(); // Evitar que el carácter se ingrese
+        }
+    }//GEN-LAST:event_txtidKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

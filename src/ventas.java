@@ -231,6 +231,12 @@ public class ventas extends javax.swing.JPanel {
 
         jLabel4.setText("STOCK");
 
+        txtstock.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtstockKeyTyped(evt);
+            }
+        });
+
         jLabel3.setText("NOMBRE");
 
         jLabel2.setText("ID");
@@ -378,6 +384,14 @@ public class ventas extends javax.swing.JPanel {
             evt.consume(); // Evitar que el carácter se ingrese
         }
     }//GEN-LAST:event_txtcantidadKeyTyped
+
+    private void txtstockKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtstockKeyTyped
+       char c = evt.getKeyChar();
+        // Si no es un número (dígito) o la tecla de retroceso (para borrar), lo ignoramos
+        if (!Character.isDigit(c)) {
+            evt.consume(); // Evitar que el carácter se ingrese
+        }
+    }//GEN-LAST:event_txtstockKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

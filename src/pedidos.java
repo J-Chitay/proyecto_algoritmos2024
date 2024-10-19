@@ -534,6 +534,12 @@ public class pedidos extends javax.swing.JPanel {
         areaPedido.setRows(5);
         jScrollPane1.setViewportView(areaPedido);
 
+        txtCantidad.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtCantidadKeyTyped(evt);
+            }
+        });
+
         jLabel11.setText("CANTIDAD");
 
         jLabel12.setText("AREA DEL PEDIDO");
@@ -685,6 +691,14 @@ public class pedidos extends javax.swing.JPanel {
         actualizarEstadoPedido();
     }//GEN-LAST:event_btnActualizarActionPerformed
 
+    private void txtCantidadKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCantidadKeyTyped
+        char c = evt.getKeyChar();
+        // Si no es un número (dígito) o la tecla de retroceso (para borrar), lo ignoramos
+        if (!Character.isDigit(c)) {
+            evt.consume(); // Evitar que el carácter se ingrese
+        }
+    }//GEN-LAST:event_txtCantidadKeyTyped
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea areaPedido;
@@ -694,7 +708,6 @@ public class pedidos extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> comboEstado;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
@@ -702,15 +715,8 @@ public class pedidos extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblTotal;
@@ -719,13 +725,7 @@ public class pedidos extends javax.swing.JPanel {
     private javax.swing.JTextField txtestado;
     private javax.swing.JTextField txtid;
     private javax.swing.JTextField txtid1;
-    private javax.swing.JTextField txtid2;
-    private javax.swing.JTextField txtid3;
     private javax.swing.JTextField txtpassword;
-    private javax.swing.JTextField txtpassword1;
-    private javax.swing.JTextField txtpassword2;
     private javax.swing.JTextField txtuser;
-    private javax.swing.JTextField txtuser1;
-    private javax.swing.JTextField txtuser2;
     // End of variables declaration//GEN-END:variables
 }
